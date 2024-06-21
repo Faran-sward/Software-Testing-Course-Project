@@ -51,11 +51,6 @@ public class StoreGetinformationService {
         Optional<StoreEntity> store = storeGetinformationRepository.
                 findById(Integer.valueOf(request.getSto_ID()));
 
-        if(store.isEmpty()){
-            response.setMessage("error occurred in database");
-            return response;
-        }
-
         StoreCategoriesEntity[] categoriesEntities = storeCategoriesGetinformationRepository.
                 findAllByStoreId(Integer.valueOf(request.getSto_ID())).toArray(new StoreCategoriesEntity[0]);
 

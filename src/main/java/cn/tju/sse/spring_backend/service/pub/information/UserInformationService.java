@@ -55,12 +55,6 @@ public class UserInformationService {
         Optional<UsersEntity> user = userInformationRepository.
                 findById(Integer.valueOf(request.getUser_ID()));
 
-        // check if the data is obtained
-        if(user.isEmpty()){
-            response.setMessage("error occurred in database");
-            return response;  // error by repository or database
-        }
-
         // throw should not be executed
         response = userInformationResponseMapper.entityToResponse(user.orElseThrow());
         response.setMessage("success");

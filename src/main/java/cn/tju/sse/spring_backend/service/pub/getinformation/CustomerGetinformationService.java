@@ -40,10 +40,6 @@ public class CustomerGetinformationService {
         Optional<CustomerEntity> customer = customerGetinformationRepository.
                 findById(Integer.valueOf(request.getCus_ID()));
 
-        if(customer.isEmpty()){
-            response.setMessage("error occurred in database");
-            return response;
-        }
 
         CustomerLoveEntity[] loves = customerLoveGetinformationRepository.
                 findAllByCusId(Integer.parseInt(request.getCus_ID())).toArray(new CustomerLoveEntity[0]);
