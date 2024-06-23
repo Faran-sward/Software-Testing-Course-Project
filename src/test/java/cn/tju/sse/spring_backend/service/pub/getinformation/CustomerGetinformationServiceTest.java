@@ -13,9 +13,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
@@ -34,11 +36,29 @@ public class CustomerGetinformationServiceTest {
     private CustomerGetinformationService service;
 
     private static Stream<Arguments> provideCustomerData() {
-        return Stream.of(
-                Arguments.of("100", new CustomerEntity(100, "Nick1", "Note1", "Password1", 1), new CustomerLoveEntity[]{new CustomerLoveEntity(100, "Books", 5)}, "success"),
-                Arguments.of("200", null, new CustomerLoveEntity[0], "customers not found"), // 测试不存在的顾客
-                Arguments.of("300", new CustomerEntity(300, "Nick3", "Note3", "Password3", 1), new CustomerLoveEntity[0], "success") // 测试没有兴趣爱好的情况
-        );
+        Random random = new Random();
+        final int[] successCount = {0};
+        final int[] failureCount = {0};
+
+        return IntStream.range(0, 100).mapToObj(i -> {
+            String cusId = String.valueOf(random.nextInt(1000));
+            CustomerEntity customer = new CustomerEntity(random.nextInt(1000), "Nick" + cusId, "Note" + cusId, "Password" + cusId, random.nextInt(2));
+            CustomerLoveEntity[] loves = IntStream.range(0, random.nextInt(3)).mapToObj(j -> new CustomerLoveEntity(random.nextInt(1000), "Category" + j, random.nextInt(6))).toArray(CustomerLoveEntity[]::new);
+
+            // 保持8:2的成功和失败比例
+            String expectedMessage;
+            if (successCount[0] < 80) {
+                expectedMessage = "success";
+                successCount[0]++;
+            } else {
+                expectedMessage = "customers not found";
+                customer = null;
+                loves = new CustomerLoveEntity[0];
+                failureCount[0]++;
+            }
+
+            return Arguments.of(cusId, customer, loves, expectedMessage);
+        }).collect(Collectors.toList()).stream();
     }
 
     @ParameterizedTest

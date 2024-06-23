@@ -13,9 +13,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
@@ -34,11 +36,29 @@ public class StoreGetinformationServiceTest {
     private StoreGetinformationService service;
 
     private static Stream<Arguments> provideStoreData() {
-        return Stream.of(
-                Arguments.of("1", new StoreEntity(1, "Store A", "Introduction A", "License A", 1), new String[]{"Books", "Electronics"}, "success"),
-                Arguments.of("2", null, new String[0], "store not found"),  // 测试不存在的商家
-                Arguments.of("3", new StoreEntity(3, "Store C", "Introduction C", "License C", 1), new String[]{}, "success")  // 商家无分类信息
-        );
+        Random random = new Random();
+        final int[] successCount = {0};
+        final int[] failureCount = {0};
+
+        return IntStream.range(0, 100).mapToObj(i -> {
+            String stoId = String.valueOf(random.nextInt(1000));
+            StoreEntity store = new StoreEntity(random.nextInt(1000), "Store " + stoId, "Introduction " + stoId, "License " + stoId, random.nextInt(2));
+            String[] categories = IntStream.range(0, random.nextInt(3)).mapToObj(j -> "Category" + j).toArray(String[]::new);
+
+            // 保持8:2的成功和失败比例
+            String expectedMessage;
+            if (successCount[0] < 80) {
+                expectedMessage = "success";
+                successCount[0]++;
+            } else {
+                expectedMessage = "store not found";
+                store = null;
+                categories = new String[0];
+                failureCount[0]++;
+            }
+
+            return Arguments.of(stoId, store, categories, expectedMessage);
+        }).collect(Collectors.toList()).stream();
     }
 
     @ParameterizedTest
@@ -56,7 +76,7 @@ public class StoreGetinformationServiceTest {
 
         StoreCategoriesEntity[] categoriesEntities = new StoreCategoriesEntity[categories.length];
         for (int i = 0; i < categories.length; i++) {
-            categoriesEntities[i] = new StoreCategoriesEntity(store.getStoId(), categories[i]);
+            categoriesEntities[i] = new StoreCategoriesEntity(store != null ? store.getStoId() : Integer.parseInt(stoId), categories[i]);
         }
         when(storeCategoriesGetinformationRepository.findAllByStoreId(Integer.parseInt(stoId))).thenReturn(java.util.Arrays.asList(categoriesEntities));
 

@@ -11,11 +11,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
@@ -31,11 +33,27 @@ public class UserInformationServiceTest {
     private UserInformationService service;
 
     private static Stream<Arguments> provideUserData() {
-        return Stream.of(
-                Arguments.of("1", new UsersEntity("1234567890", "password1", "Address1", 1, new Date(System.currentTimeMillis()), 1, 1, new BigDecimal("100.00")), "success"),
-                Arguments.of("2", null, "user not found"),  // 测试不存在的用户
-                Arguments.of("3", new UsersEntity("2345678901", "password2", "Address2", 1, new Date(System.currentTimeMillis()), 1, 3, new BigDecimal("200.00")), "success")  // 用户存在
-        );
+        Random random = new Random();
+        final int[] successCount = {0};
+        final int[] failureCount = {0};
+
+        return IntStream.range(0, 100).mapToObj(i -> {
+            String userId = String.valueOf(random.nextInt(1000));
+            UsersEntity user = new UsersEntity("1234567890" + userId, "password" + userId, "Address" + userId, random.nextInt(2), new Date(System.currentTimeMillis()), random.nextInt(5), random.nextInt(10), new BigDecimal("100.00").multiply(new BigDecimal(random.nextInt(10) + 1)));
+
+            // 保持8:2的成功和失败比例
+            String expectedMessage;
+            if (successCount[0] < 80) {
+                expectedMessage = "success";
+                successCount[0]++;
+            } else {
+                expectedMessage = "user not found";
+                user = null;
+                failureCount[0]++;
+            }
+
+            return Arguments.of(userId, user, expectedMessage);
+        }).collect(Collectors.toList()).stream();
     }
 
     @ParameterizedTest

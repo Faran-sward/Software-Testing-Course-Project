@@ -20,7 +20,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserModifyControllerTest {
@@ -33,11 +36,28 @@ public class UserModifyControllerTest {
 
     // Method to provide test cases
     private static Stream<Arguments> provideUserModifyData() {
-        return Stream.of(
-                Arguments.of("1", "1234567890", "newPassword", "1234 Main St", "Success"),
-                Arguments.of("2", "0987654321", "anotherPass", "5678 Second St", "Failure due to invalid ID"),
-                Arguments.of("3", "1122334455", "password123", "91011 Third St", "Success")
-        );
+        Random random = new Random();
+        final int[] successCount = {0};
+        final int[] failureCount = {0};
+
+        return IntStream.range(0, 100).mapToObj(i -> {
+            String userId = String.valueOf(random.nextInt(1000));
+            String phone = String.format("%010d", random.nextInt(1000000000));
+            String password = "password" + userId;
+            String address = "Address " + userId;
+
+            // 保持8:2的成功和失败比例
+            String message;
+            if (successCount[0] < 80) {
+                message = "Success";
+                successCount[0]++;
+            } else {
+                message = "Failure due to invalid data";
+                failureCount[0]++;
+            }
+
+            return Arguments.of(userId, phone, password, address, message);
+        }).collect(Collectors.toList()).stream();
     }
 
     @ParameterizedTest

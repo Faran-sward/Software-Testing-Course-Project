@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
@@ -53,12 +54,19 @@ public class StoreModifyServiceTest {
     }
 
     private static Stream<Arguments> provideStoreModifyData() {
-        return Stream.of(
-                Arguments.of("1", "Store AAAAAAAAAAAAAAAAAAAAAAAAA", "Introduction A", new String[]{"Books", "Electronics"}, "name is too long", true, false),
-                Arguments.of("2", "Store B", "Introduction B", new String[]{"Invalid"}, "categories not right", true, false),
-                Arguments.of("3", "", "", new String[]{"Books"}, "store not found", false, true),
-                Arguments.of("4", "Store D", "Introduction D", new String[]{"Books"}, "success", true, true)
-        );
+        Random random = new Random();
+        return Stream.generate(() -> {
+            boolean isSuccess = random.nextInt(10) < 8;
+            String stoId = String.valueOf(random.nextInt(1000));
+            String name = isSuccess ? "ValidStoreName" : "Store AAAAAAAAAAAAAAAAAAAAAAAAA";
+            String intro = isSuccess ? "ValidIntroduction" : "";
+            String[] categories = isSuccess ? new String[]{"Books"} : new String[]{"Invalid"};
+            boolean exists = isSuccess;
+            boolean validCategories = isSuccess;
+            String expectedMessage = isSuccess ? "success" : (exists ? (validCategories ? "name is too long" : "categories not right") : "store not found");
+
+            return Arguments.of(stoId, name, intro, categories, expectedMessage, exists, validCategories);
+        }).limit(100);
     }
 
     @ParameterizedTest

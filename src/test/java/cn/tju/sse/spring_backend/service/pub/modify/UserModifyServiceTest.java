@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
@@ -30,12 +31,18 @@ public class UserModifyServiceTest {
     private UserModifyService service;
 
     private static Stream<Arguments> provideUserModifyData() {
-        return Stream.of(
-                Arguments.of("1", "1234567890", "password1", "Address1", true, "success"),
-                Arguments.of("2", "", "", "Address2", false, "user not found"),  // 测试不存在的用户
-                Arguments.of("3", "123456789012345678901", "", "", true, "phone is too long"),  // 电话号码过长
-                Arguments.of("4", "1234567890", "password2", "", true, "success")  // 用户存在，部分更新
-        );
+        Random random = new Random();
+        return Stream.generate(() -> {
+            boolean isSuccess = random.nextInt(10) < 8;
+            String userId = String.valueOf(random.nextInt(1000));
+            String phone = isSuccess ? "1234567890" : "123456789012345678901";
+            String password = "password" + random.nextInt(1000);
+            String address = isSuccess ? "ValidAddress" : "";
+            boolean userExists = isSuccess;
+            String expectedMessage = isSuccess ? "success" : (userExists ? "phone is too long" : "user not found");
+
+            return Arguments.of(userId, phone, password, address, userExists, expectedMessage);
+        }).limit(100);
     }
 
     @ParameterizedTest

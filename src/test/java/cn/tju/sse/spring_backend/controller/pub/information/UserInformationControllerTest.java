@@ -28,16 +28,27 @@ public class UserInformationControllerTest {
     private UserInformationService userInformationService;  // Mock the service layer
 
     @ParameterizedTest
-    @ValueSource(strings = {"123", "456", "789"})
+    @ValueSource(strings = {
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+            "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
+            "31", "32", "33", "34", "35", "36", "37", "38", "39", "40",
+            "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
+            "51", "52", "53", "54", "55", "56", "57", "58", "59", "60",
+            "61", "62", "63", "64", "65", "66", "67", "68", "69", "70",
+            "71", "72", "73", "74", "75", "76", "77", "78", "79", "80",
+            "81", "82", "83", "84", "85", "86", "87", "88", "89", "90",
+            "91", "92", "93", "94", "95", "96", "97", "98", "99", "100"
+    })
     public void testUserInformation(String userId) throws Exception {
         UserInformationResponseDTO mockResponse = UserInformationResponseDTO.builder()
                 .user_ID(userId)
-                .user_phone("1234567890")
-                .user_password("password")
-                .user_address("1234 Main St")
-                .user_balance("1000")
-                .user_regTime("2024-01-01")
-                .user_type("standard")
+                .user_phone("123456789" + userId)
+                .user_password("password" + userId)
+                .user_address("Address " + userId)
+                .user_balance(String.valueOf(1000 + Integer.parseInt(userId)))
+                .user_regTime("2024-01-" + (Integer.parseInt(userId) % 30 + 1))
+                .user_type(userId.equals("50") ? "premium" : "standard")
                 .message("Success")
                 .build();
 
@@ -50,11 +61,11 @@ public class UserInformationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success"))
                 .andExpect(jsonPath("$.user_ID").value(userId))
-                .andExpect(jsonPath("$.user_phone").value("1234567890"))
-                .andExpect(jsonPath("$.user_password").value("password"))
-                .andExpect(jsonPath("$.user_address").value("1234 Main St"))
-                .andExpect(jsonPath("$.user_balance").value("1000"))
-                .andExpect(jsonPath("$.user_regTime").value("2024-01-01"))
-                .andExpect(jsonPath("$.user_type").value("standard"));
+                .andExpect(jsonPath("$.user_phone").value("123456789" + userId))
+                .andExpect(jsonPath("$.user_password").value("password" + userId))
+                .andExpect(jsonPath("$.user_address").value("Address " + userId))
+                .andExpect(jsonPath("$.user_balance").value(String.valueOf(1000 + Integer.parseInt(userId))))
+                .andExpect(jsonPath("$.user_regTime").value("2024-01-" + (Integer.parseInt(userId) % 30 + 1)))
+                .andExpect(jsonPath("$.user_type").value(userId.equals("50") ? "premium" : "standard"));
     }
 }

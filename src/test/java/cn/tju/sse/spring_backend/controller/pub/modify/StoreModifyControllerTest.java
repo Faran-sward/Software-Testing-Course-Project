@@ -2,7 +2,6 @@ package cn.tju.sse.spring_backend.controller.pub.modify;
 
 import cn.tju.sse.spring_backend.dto.pub.modify.StoreModifyResponseDTO;
 import cn.tju.sse.spring_backend.service.pub.modify.StoreModifyService;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +12,16 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,12 +33,54 @@ public class StoreModifyControllerTest {
     @MockBean
     private StoreModifyService storeModifyService;
 
+
     private static Stream<TestData> provideTestData() {
-        return Stream.of(
-                new TestData("123", "New Introduction", "New Store Name", new String[]{"electronics"}, "license1.jpg", new String[]{"picture1.jpg"}, "Success"),
-                new TestData("456", "Old Introduction", "Old Store Name", new String[]{"books"}, "license2.jpg", new String[]{"picture2.jpg", "picture3.jpg"}, "Failure")
-        );
+        Random random = new Random();
+        String[] categoriesPool = {"electronics", "books", "clothing", "food", "toys", "sports"};
+
+        AtomicInteger successCount = new AtomicInteger();
+        AtomicInteger failureCount = new AtomicInteger();
+
+        return IntStream.range(0, 100).mapToObj(i -> {
+            String stoId = String.valueOf(random.nextInt(1000));
+            String introduction = "Introduction " + stoId;
+            String storeName = "Store Name " + stoId;
+            String[] categories = getRandomCategories(categoriesPool, random);
+            String licenseFileName = "license" + stoId + ".jpg";
+            String[] pictureFileNames = getRandomPictureFileNames(stoId, random);
+
+            // 保持8:2的成功和失败比例
+            String expectedMessage;
+            if (successCount.get() < 80) {
+                expectedMessage = "Success";
+                successCount.getAndIncrement();
+            } else {
+                expectedMessage = "Failure";
+                failureCount.getAndIncrement();
+            }
+
+            return new TestData(stoId, introduction, storeName, categories, licenseFileName, pictureFileNames, expectedMessage);
+        }).collect(Collectors.toList()).stream();
     }
+
+    private static String[] getRandomCategories(String[] categoriesPool, Random random) {
+        int numCategories = random.nextInt(categoriesPool.length) + 1;
+        String[] categories = new String[numCategories];
+        for (int i = 0; i < numCategories; i++) {
+            categories[i] = categoriesPool[random.nextInt(categoriesPool.length)];
+        }
+        return categories;
+    }
+
+    private static String[] getRandomPictureFileNames(String stoId, Random random) {
+        int numPictures = random.nextInt(3) + 1;
+        String[] pictureFileNames = new String[numPictures];
+        for (int i = 0; i < numPictures; i++) {
+            pictureFileNames[i] = "picture" + stoId + "_" + i + ".jpg";
+        }
+        return pictureFileNames;
+    }
+
 
     @ParameterizedTest
     @MethodSource("provideTestData")
