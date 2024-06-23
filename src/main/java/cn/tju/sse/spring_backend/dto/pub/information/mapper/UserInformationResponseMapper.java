@@ -20,7 +20,7 @@ public interface UserInformationResponseMapper {
     @Mapping(target = "user_password", source = "userPassword")
     @Mapping(target = "user_address", source = "userAddress")
     @Mapping(target = "user_balance", source = "userBalance")
-    @Mapping(target = "user_regTime", source = "userRegtime")
+    @Mapping(target = "user_regTime", source = "userRegtime", dateFormat = "yyyy-mm-dd")
     @Mapping(target = "user_type", source = "userType")
     @Mapping(target = "message", ignore = true)
     UserInformationResponseDTO entityToResponse(UsersEntity user);
