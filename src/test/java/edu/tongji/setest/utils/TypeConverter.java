@@ -1,4 +1,4 @@
-package setest.utils;
+package edu.tongji.setest.utils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;

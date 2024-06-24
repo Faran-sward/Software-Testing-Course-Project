@@ -19,7 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import setest.utils.testCase.TestCase;
+import edu.tongji.setest.utils.testCase.TestCase;
 
 import java.io.IOException;
 import java.util.Optional;

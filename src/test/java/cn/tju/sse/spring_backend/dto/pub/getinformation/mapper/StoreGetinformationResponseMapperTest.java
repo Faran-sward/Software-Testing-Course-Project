@@ -4,12 +4,11 @@ import cn.tju.sse.spring_backend.TestFileConfig;
 import cn.tju.sse.spring_backend.dto.pub.getinformation.StoreGetinformationResponseDTO;
 import cn.tju.sse.spring_backend.model.StoreCategoriesEntity;
 import cn.tju.sse.spring_backend.model.StoreEntity;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.Assertions;
-import setest.utils.testCase.TestCase;
+import edu.tongji.setest.utils.testCase.TestCase;
 
 import java.io.IOException;
 import java.util.Arrays;

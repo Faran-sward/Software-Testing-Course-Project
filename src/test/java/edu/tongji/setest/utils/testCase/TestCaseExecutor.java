@@ -1,7 +1,7 @@
-package setest.utils.testCase;
+package edu.tongji.setest.utils.testCase;
 
+import edu.tongji.setest.utils.DataConverter;
 import lombok.Getter;
-import setest.utils.DataConverter;
 
 import java.io.File;
 import java.io.IOException;

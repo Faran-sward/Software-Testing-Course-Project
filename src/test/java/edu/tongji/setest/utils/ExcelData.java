@@ -1,4 +1,4 @@
-package setest.utils;
+package edu.tongji.setest.utils;
 
 import lombok.Getter;
 

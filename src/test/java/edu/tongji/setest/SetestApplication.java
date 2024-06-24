@@ -1,4 +1,4 @@
-package setest;
+package edu.tongji.setest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

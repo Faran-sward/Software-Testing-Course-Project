@@ -1,18 +1,15 @@
-package setest.utils.testCase;
+package edu.tongji.setest.utils.testCase;
 
+import edu.tongji.setest.utils.DataConverter;
+import edu.tongji.setest.utils.ExcelData;
+import edu.tongji.setest.utils.TypeConverter;
 import lombok.Getter;
-import setest.utils.DataConverter;
-import setest.utils.ExcelData;
-import setest.utils.TypeConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import static setest.utils.DataConverter.convertToMethodData;
 
 /**
  * @author asahi
@@ -99,7 +96,7 @@ public class TestCase {
         // 数据类型转换
         List<Map<String, Object>> data = excelData.getData();
         List<String> DataMap = excelData.getDataMap();
-        DataList = convertToMethodData(data, DataMap, parameterTypes, resultType);
+        DataList = DataConverter.convertToMethodData(data, DataMap, parameterTypes, resultType);
     }
 
     public TestCase (InputStream file) throws Exception {
@@ -118,7 +115,7 @@ public class TestCase {
         // 数据类型转换
         List<Map<String, Object>> data = excelData.getData();
         List<String> DataMap = excelData.getDataMap();
-        DataList = convertToMethodData(data, DataMap, parameterTypes, resultType);
+        DataList = DataConverter.convertToMethodData(data, DataMap, parameterTypes, resultType);
     }
 
     public void print () {

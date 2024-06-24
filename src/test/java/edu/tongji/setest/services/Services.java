@@ -1,8 +1,8 @@
-package setest.services;
+package edu.tongji.setest.services;
 
-import setest.utils.ScriptPackageManager;
+import edu.tongji.setest.utils.ScriptPackageManager;
 import org.springframework.stereotype.Service;
-import setest.utils.testCase.TestCaseExecutor;
+import edu.tongji.setest.utils.testCase.TestCaseExecutor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;

@@ -1,12 +1,12 @@
-package setest.controllers;
+package edu.tongji.setest.controllers;
 
-import setest.services.Services;
+import edu.tongji.setest.services.Services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import setest.utils.testCase.TestCaseExecutor;
+import edu.tongji.setest.utils.testCase.TestCaseExecutor;
 
 import java.io.IOException;
 import java.io.InputStream;
