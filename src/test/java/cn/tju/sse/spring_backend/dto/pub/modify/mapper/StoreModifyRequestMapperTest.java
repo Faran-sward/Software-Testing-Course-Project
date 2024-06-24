@@ -9,9 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mapstruct.factory.Mappers;
-import org.mockito.Mockito;
 import org.springframework.web.multipart.MultipartFile;
-import setest.utils.testCase.TestCase;
+import edu.tongji.setest.utils.testCase.TestCase;
 
 import java.io.IOException;
 import java.util.stream.Stream;

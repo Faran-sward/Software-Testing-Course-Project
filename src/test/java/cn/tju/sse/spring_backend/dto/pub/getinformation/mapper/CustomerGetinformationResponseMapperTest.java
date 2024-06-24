@@ -7,7 +7,7 @@ import cn.tju.sse.spring_backend.model.CustomerLoveEntity;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import setest.utils.testCase.TestCase;
+import edu.tongji.setest.utils.testCase.TestCase;
 
 import static org.junit.jupiter.api.Assertions.*;
 

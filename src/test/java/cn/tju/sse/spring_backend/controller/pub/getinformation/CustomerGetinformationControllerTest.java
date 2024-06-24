@@ -5,7 +5,6 @@ import cn.tju.sse.spring_backend.dto.pub.getinformation.CustomerGetinformationRe
 import cn.tju.sse.spring_backend.dto.pub.getinformation.CustomerGetinformationResponseDTO;
 import cn.tju.sse.spring_backend.service.pub.getinformation.CustomerGetinformationService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import setest.utils.testCase.TestCase;
+import edu.tongji.setest.utils.testCase.TestCase;
 
 import java.io.IOException;
 import java.util.stream.Stream;

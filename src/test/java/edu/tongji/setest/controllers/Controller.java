@@ -1,19 +1,23 @@
-package setest.controllers;
+package edu.tongji.setest.controllers;
 
-import setest.services.Services;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import edu.tongji.setest.services.Services;
+import edu.tongji.setest.utils.testCase.TestCaseExecutor;
+import edu.tongji.setest.utils.testRunner.TestRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import setest.utils.testCase.TestCaseExecutor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author asahi
@@ -125,11 +129,58 @@ public class Controller {
     }
 
     @GetMapping("/execute")
-    public ResponseEntity<List<Boolean>> executeCase(@RequestParam String methodName) {
-        List<Boolean> executionResult = services.executeCase(methodName);
+    public ResponseEntity<String> executeCase(@RequestParam String methodName) throws JsonProcessingException {
+        String executionResult = services.executeCase(methodName);
 
         return ResponseEntity.ok(executionResult);
     }
 
+    @GetMapping("/default")
+    public ResponseEntity<String> executeDefaultCase(@RequestParam String className, int method) throws Exception {
+        String executionResult = "new ArrayList<>();";
+        if (Objects.equals(className, "三角形")) {
+            services.chooseClass("Triangle");
+            System.out.println("class :" + className);
+            services.uploadCase(String.format("../cases/Triangle/%d.xlsx", method));
+            System.out.println("method :" + method);
+            executionResult = services.executeCase("getTriangleType");
+        }
+        else if (Objects.equals(className, "万年历")) {
+            services.chooseClass("NextDayCalculator");
+            System.out.println("class :" + className);
+            services.uploadCase(String.format("../cases/NextDayCalculator/%d.xlsx", method));
+            System.out.println("method :" + method);
+            executionResult = services.executeCase("getNextDay");
+        }
+        else if (Objects.equals(className, "电脑销售系统")) {
+            services.chooseClass("SalesSystem");
+            System.out.println("class :" + className);
+            services.uploadCase(String.format("../cases/SalesSystem/%d.xlsx", method));
+            System.out.println("method :" + method);
+            executionResult = services.executeCase("calculateSales");
+        }
+        else if (Objects.equals(className, "电信收费")) {
+            services.chooseClass("TelecomBillingSystem");
+            System.out.println("class :" + className);
+            services.uploadCase(String.format("../cases/TelecomBillingSystem/%d.xlsx", method));
+            System.out.println("method :" + method);
+            executionResult = services.executeCase("calculateMonthlyBill");
+        }
+        else if (Objects.equals(className, "销售系统")) {
+            services.chooseClass("SalesCommissionSystem");
+            System.out.println("class :" + className);
+            services.uploadCase(String.format("../cases/SalesCommissionSystem/%d.xlsx", method));
+            System.out.println("method :" + method);
+            executionResult = services.executeCase("calculateCommission");
+        }
+
+        return ResponseEntity.ok(executionResult);
+    }
+
+    @GetMapping("/unit-test")
+    public ResponseEntity<String> unitTest() throws JsonProcessingException {
+        String executionResult = TestRunner.runAllTests("cn.tju.sse.spring_backend");
+        return ResponseEntity.ok(executionResult);
+    }
 }
 

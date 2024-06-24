@@ -1,18 +1,15 @@
-package setest.utils.testCase;
+package edu.tongji.setest.utils.testCase;
 
+import edu.tongji.setest.utils.DataConverter;
 import lombok.Getter;
-import setest.utils.DataConverter;
-import setest.utils.ExcelData;
-import setest.utils.TypeConverter;
+import edu.tongji.setest.utils.ExcelData;
+import edu.tongji.setest.utils.TypeConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import static setest.utils.DataConverter.convertToMethodData;
 
 /**
  * @author asahi
@@ -71,6 +68,52 @@ public class TestCase {
         // 读取类型
         List<List<String>> headers = excelData.getHeaders();
         List<String> lastRow = headers.get(headers.size() - 1);
+        List<String> secondLastRow = headers.get(headers.size() - 2);
+
+        // 调用方法删除第一个空字符串及其后面的所有空字符串
+        removeTrailingEmptyStrings(lastRow);
+        removeTrailingEmptyStrings(secondLastRow);
+
+        if ("comment".equalsIgnoreCase(secondLastRow.get(secondLastRow.size() - 1))){  // 以comment结尾
+            if ("output".equalsIgnoreCase(secondLastRow.get(secondLastRow.size() - 2))) {  // 且返回值不为void
+                paramsTypeName = lastRow.subList(0, lastRow.size() - 2);
+                resultTypeName = lastRow.get(lastRow.size() - 2);
+            }
+            else {
+                // subList 不包括结束索引的元素
+                paramsTypeName = lastRow.subList(0, lastRow.size() - 1);  // 返回值为void
+                resultTypeName = "void";
+            }
+        }
+        else {
+            if ("output".equalsIgnoreCase(secondLastRow.get(secondLastRow.size() - 1))) {  // 且返回值不为void
+                paramsTypeName = lastRow.subList(0, lastRow.size() - 1);
+                resultTypeName = lastRow.get(lastRow.size() - 1);
+            }
+            else {
+                // 既没有output 也没有 comment ， 默认为无返回值函数
+                paramsTypeName = lastRow;
+                resultTypeName = "void";
+            }
+        }
+
+
+        // 类型转换
+        parameterTypes = TypeConverter.convertToClassList(paramsTypeName).toArray(new Class[0]);
+        resultType = TypeConverter.convertToClass(resultTypeName);
+
+        // 数据类型转换
+        List<Map<String, Object>> data = excelData.getData();
+        List<String> DataMap = excelData.getDataMap();
+        DataList = DataConverter.convertToMethodData(data, DataMap, parameterTypes, resultType);
+    }
+
+    public TestCase (InputStream file) throws Exception {
+        ExcelData excelData = new ExcelData(file);
+
+        // 读取类型
+        List<List<String>> headers = excelData.getHeaders();
+        List<String> lastRow = headers.get(headers.size() - 1);
 
         // 调用方法删除第一个空字符串及其后面的所有空字符串
         removeTrailingEmptyStrings(lastRow);
@@ -91,7 +134,6 @@ public class TestCase {
             resultTypeName = "void";
         }
 
-
         // 类型转换
         parameterTypes = TypeConverter.convertToClassList(paramsTypeName).toArray(new Class[0]);
         resultType = TypeConverter.convertToClass(resultTypeName);
@@ -99,26 +141,7 @@ public class TestCase {
         // 数据类型转换
         List<Map<String, Object>> data = excelData.getData();
         List<String> DataMap = excelData.getDataMap();
-        DataList = convertToMethodData(data, DataMap, parameterTypes, resultType);
-    }
-
-    public TestCase (InputStream file) throws Exception {
-        ExcelData excelData = new ExcelData(file);
-
-        // 读取类型
-        List<List<String>> headers = excelData.getHeaders();
-        List<String> lastRow = headers.get(headers.size() - 1);
-        paramsTypeName = lastRow.subList(0, lastRow.size() - 2);
-        resultTypeName = lastRow.get(lastRow.size() - 2);
-
-        // 类型转换
-        parameterTypes = TypeConverter.convertToClassList(paramsTypeName).toArray(new Class[0]);
-        resultType = TypeConverter.convertToClass(resultTypeName);
-
-        // 数据类型转换
-        List<Map<String, Object>> data = excelData.getData();
-        List<String> DataMap = excelData.getDataMap();
-        DataList = convertToMethodData(data, DataMap, parameterTypes, resultType);
+        DataList = DataConverter.convertToMethodData(data, DataMap, parameterTypes, resultType);
     }
 
     public void print () {
