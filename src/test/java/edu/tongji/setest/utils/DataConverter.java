@@ -1,4 +1,4 @@
-package setest.utils;
+package edu.tongji.setest.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mockito.Mockito;
