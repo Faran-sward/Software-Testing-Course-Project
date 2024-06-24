@@ -1,5 +1,7 @@
 package edu.tongji.setest.utils.testCase;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tongji.setest.utils.DataConverter;
 import lombok.Getter;
 
@@ -27,14 +29,17 @@ public class TestCaseExecutor {
     private final Class<?> clazz;
 //    private Map<String, List<String>> methodParameterMap;
     private final TestCase testCase;
-    public static final String clazzRootPath = "edu.tongji.setest.testObjects.";
+    public static final String clazzRootPath = "testObjects.";
+    private final List<String> actualOutputs = new ArrayList<>();
+    private final List<String> expectedOutputs = new ArrayList<>();
+
 
     public TestCaseExecutor (String caseFilePath, String className) throws IOException, ClassNotFoundException {
         testCase = new TestCase(caseFilePath);
 
         String clazzPath = clazzRootPath + className;
         clazz = findClassByName(clazzPath);
-        findMethodParameters(clazz);
+//        findMethodParameters(clazz);
     }
 
     public TestCaseExecutor (InputStream caseFile, String className) throws Exception, ClassNotFoundException {
@@ -44,7 +49,7 @@ public class TestCaseExecutor {
         clazz = findClassByName(clazzPath);
     }
 
-    public List<Boolean> execute(String methodName) {
+    public String execute(String methodName) throws JsonProcessingException {
         if (!hasMethod(methodName)){
             System.out.println("this class does not have this method.");
             return null;
@@ -58,6 +63,7 @@ public class TestCaseExecutor {
 
         // 存储比较结果
         List<Boolean> comparisonResults = new ArrayList<>();
+        String jsonString = "";
 
         // 遍历测试数据
         for (DataConverter.MethodData testData : dataList) {
@@ -68,7 +74,8 @@ public class TestCaseExecutor {
                 // 调用方法
                 Object actualResult = clazz.getMethod(methodName, parameterTypes.toArray(new Class<?>[0]))
                         .invoke(null, parameters);
-
+                actualOutputs.add(actualResult.toString());
+                expectedOutputs.add(testData.getResult().toString());
                 // 比较实际结果和期望结果
                 boolean resultMatch = actualResult.equals(testData.getResult());
                 comparisonResults.add(resultMatch);
@@ -77,8 +84,16 @@ public class TestCaseExecutor {
                 e.printStackTrace();
                 comparisonResults.add(false); // 如果出现异常，则将比较结果设置为 false
             }
+
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("comparisonResults", comparisonResults);
+            resultMap.put("actualOutputs", actualOutputs);
+            resultMap.put("expectedOutputs", expectedOutputs);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            jsonString = objectMapper.writeValueAsString(resultMap);
         }
-        return comparisonResults;
+        return jsonString;
     }
 
     public static List<String> getMethods(String className) throws ClassNotFoundException {

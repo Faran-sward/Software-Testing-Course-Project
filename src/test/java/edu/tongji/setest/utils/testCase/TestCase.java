@@ -1,9 +1,9 @@
 package edu.tongji.setest.utils.testCase;
 
 import edu.tongji.setest.utils.DataConverter;
+import lombok.Getter;
 import edu.tongji.setest.utils.ExcelData;
 import edu.tongji.setest.utils.TypeConverter;
-import lombok.Getter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,12 +68,14 @@ public class TestCase {
         // 读取类型
         List<List<String>> headers = excelData.getHeaders();
         List<String> lastRow = headers.get(headers.size() - 1);
+        List<String> secondLastRow = headers.get(headers.size() - 2);
 
         // 调用方法删除第一个空字符串及其后面的所有空字符串
         removeTrailingEmptyStrings(lastRow);
+        removeTrailingEmptyStrings(secondLastRow);
 
-        if ("comment".equalsIgnoreCase(lastRow.get(lastRow.size() - 1))){  // 以comment结尾
-            if ("output".equalsIgnoreCase(lastRow.get(lastRow.size() - 2))) {  // 且返回值不为void
+        if ("comment".equalsIgnoreCase(secondLastRow.get(secondLastRow.size() - 1))){  // 以comment结尾
+            if ("output".equalsIgnoreCase(secondLastRow.get(secondLastRow.size() - 2))) {  // 且返回值不为void
                 paramsTypeName = lastRow.subList(0, lastRow.size() - 2);
                 resultTypeName = lastRow.get(lastRow.size() - 2);
             }
@@ -83,9 +85,16 @@ public class TestCase {
                 resultTypeName = "void";
             }
         }
-        else {  // 既没有output 也没有 comment ， 默认为无返回值函数
-            paramsTypeName = lastRow;
-            resultTypeName = "void";
+        else {
+            if ("output".equalsIgnoreCase(secondLastRow.get(secondLastRow.size() - 1))) {  // 且返回值不为void
+                paramsTypeName = lastRow.subList(0, lastRow.size() - 1);
+                resultTypeName = lastRow.get(lastRow.size() - 1);
+            }
+            else {
+                // 既没有output 也没有 comment ， 默认为无返回值函数
+                paramsTypeName = lastRow;
+                resultTypeName = "void";
+            }
         }
 
 
@@ -105,8 +114,25 @@ public class TestCase {
         // 读取类型
         List<List<String>> headers = excelData.getHeaders();
         List<String> lastRow = headers.get(headers.size() - 1);
-        paramsTypeName = lastRow.subList(0, lastRow.size() - 2);
-        resultTypeName = lastRow.get(lastRow.size() - 2);
+
+        // 调用方法删除第一个空字符串及其后面的所有空字符串
+        removeTrailingEmptyStrings(lastRow);
+
+        if ("comment".equalsIgnoreCase(lastRow.get(lastRow.size() - 1))){  // 以comment结尾
+            if ("output".equalsIgnoreCase(lastRow.get(lastRow.size() - 2))) {  // 且返回值不为void
+                paramsTypeName = lastRow.subList(0, lastRow.size() - 2);
+                resultTypeName = lastRow.get(lastRow.size() - 2);
+            }
+            else {
+                // subList 不包括结束索引的元素
+                paramsTypeName = lastRow.subList(0, lastRow.size() - 1);  // 返回值为void
+                resultTypeName = "void";
+            }
+        }
+        else {  // 既没有output 也没有 comment ， 默认为无返回值函数
+            paramsTypeName = lastRow;
+            resultTypeName = "void";
+        }
 
         // 类型转换
         parameterTypes = TypeConverter.convertToClassList(paramsTypeName).toArray(new Class[0]);
