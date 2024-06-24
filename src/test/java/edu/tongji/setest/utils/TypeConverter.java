@@ -1,4 +1,4 @@
-package setest.utils;
+package edu.tongji.setest.utils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -75,6 +75,8 @@ public class TypeConverter {
                 return boolean.class;
             case "String":
             case "String ":
+            case "string":
+            case "string ":
                 return String.class;
             case "Integer":
             case "Integer ":
