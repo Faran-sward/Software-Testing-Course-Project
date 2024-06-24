@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import setest.utils.testCase.TestCase;
+import edu.tongji.setest.utils.testCase.TestCase;
 
 import java.io.IOException;
 import java.util.stream.Stream;
